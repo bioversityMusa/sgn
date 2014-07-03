@@ -36,7 +36,7 @@ use CXGN::Location::LocationLookup;
 use CXGN::Stock::StockLookup;
 use CXGN::UploadFile;
 use CXGN::Fieldbook::TraitInfo;
-#use Data::Dumper;
+use Encode qw(encode_utf8);
 
 BEGIN { extends 'Catalyst::Controller::REST' }
 
@@ -119,6 +119,7 @@ sub create_fieldbook_from_trial_POST : Args(0) {
   my $md5 = Digest::MD5->new();
   $md5->addfile($F);
   close($F);
+  my $md5_string = encode_utf8($md5->digest());
 
   my $project = $trial_layout->get_project;
 
@@ -152,7 +153,7 @@ sub create_fieldbook_from_trial_POST : Args(0) {
 								     basename => basename($file_destination),
 								     dirname => dirname($file_destination),
 								     filetype => 'tablet field layout xls',
-								     md5checksum => $md5->digest(),
+								     md5checksum => $md5_string,
 								     metadata_id => $md_row->metadata_id(),
 								    });
   $file_row->insert();
